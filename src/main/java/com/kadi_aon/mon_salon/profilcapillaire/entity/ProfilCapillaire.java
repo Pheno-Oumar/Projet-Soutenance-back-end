@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 
 import com.kadi_aon.mon_salon.account.entity.Compte;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.CuirChevelu;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.DensiteCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.EtatCheveux;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.LongueurCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.PorositeCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TextureCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux;
@@ -53,13 +51,6 @@ public class ProfilCapillaire {
     @Column(length = 50)
     private PorositeCheveux porosite;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private LongueurCheveux longueur;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private DensiteCheveux densite;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cuir_chevelu", length = 50)
@@ -88,8 +79,6 @@ public class ProfilCapillaire {
             TypeCheveux typeCheveux,
             TextureCheveux texture,
             PorositeCheveux porosite,
-            LongueurCheveux longueur,
-            DensiteCheveux densite,
             CuirChevelu cuirChevelu,
             EtatCheveux etatCheveux,
             String codeProfil,
@@ -101,8 +90,6 @@ public class ProfilCapillaire {
         this.typeCheveux = typeCheveux;
         this.texture = texture;
         this.porosite = porosite;
-        this.longueur = longueur;
-        this.densite = densite;
         this.cuirChevelu = cuirChevelu;
         this.etatCheveux = etatCheveux;
         this.codeProfil = codeProfil;
@@ -120,8 +107,6 @@ public class ProfilCapillaire {
         private TypeCheveux typeCheveux;
         private TextureCheveux texture;
         private PorositeCheveux porosite;
-        private LongueurCheveux longueur;
-        private DensiteCheveux densite;
         private CuirChevelu cuirChevelu;
         private EtatCheveux etatCheveux;
         private String codeProfil;
@@ -153,15 +138,6 @@ public class ProfilCapillaire {
             return this;
         }
 
-        public Builder longueur(LongueurCheveux longueur) {
-            this.longueur = longueur;
-            return this;
-        }
-
-        public Builder densite(DensiteCheveux densite) {
-            this.densite = densite;
-            return this;
-        }
 
         public Builder cuirChevelu(CuirChevelu cuirChevelu) {
             this.cuirChevelu = cuirChevelu;
@@ -190,8 +166,8 @@ public class ProfilCapillaire {
 
         public ProfilCapillaire build() {
             return new ProfilCapillaire(
-                    id, compte, typeCheveux, texture, porosite, longueur,
-                    densite, cuirChevelu, etatCheveux, codeProfil, dateCreation, dateMiseAJour);
+                    id, compte, typeCheveux, texture, porosite,
+                    cuirChevelu, etatCheveux, codeProfil, dateCreation, dateMiseAJour);
         }
     }
 

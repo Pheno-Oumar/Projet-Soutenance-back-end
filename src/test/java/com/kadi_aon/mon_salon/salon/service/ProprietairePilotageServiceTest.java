@@ -235,8 +235,8 @@ class ProprietairePilotageServiceTest {
         when(profilCapillaireRepository.findByCompteId(20L)).thenReturn(Optional.of(profil));
 
         ProfilCapillaireDTOResponse profilDTO = new ProfilCapillaireDTOResponse(
-                1L, 20L, "Traore", "Fatou", "CREPUS", "EPAIS", "FAIBLE", "COURTS",
-                "FORTE", "SEC", "SAIN", false, LocalDateTime.now(), LocalDateTime.now()
+                1L, 20L, "Traore", "Fatou", "CREPUS", "EPAIS", "FAIBLE",
+                "SEC", "SAIN", false, LocalDateTime.now(), LocalDateTime.now()
         );
         when(profilCapillaireMapper.apply(profil)).thenReturn(profilDTO);
 

@@ -59,4 +59,13 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
     @Query("SELECT c FROM Commande c WHERE c.clientAffectation.salon.slug = :slug AND c.statut = :statut AND (c.encaisseeEnCaisse IS NULL OR c.encaisseeEnCaisse = false)")
     List<Commande> findCommandesEnAttenteEncaissement(@Param("slug") String slug, @Param("statut") StatutCommande statut);
+
+    @Query("SELECT COUNT(c) > 0 FROM Commande c WHERE (c.clientAffectation.compte.email = :email OR c.clientAffectation.compte.telephone = :email) AND LOWER(c.clientAffectation.salon.slug) = LOWER(:slugSalon) AND c.statut IN :statuts")
+    boolean existsByClientEmailAndSalonSlugAndStatutIn(@Param("email") String email, @Param("slugSalon") String slugSalon, @Param("statuts") List<StatutCommande> statuts);
+
+    @Query("SELECT COUNT(c) > 0 FROM Commande c WHERE (c.clientAffectation.compte.email = :email OR c.clientAffectation.compte.telephone = :email) AND LOWER(c.clientAffectation.salon.slug) = LOWER(:slugSalon)")
+    boolean existsByClientEmailAndSalonSlug(@Param("email") String email, @Param("slugSalon") String slugSalon);
+
+    @Query("SELECT COUNT(c) > 0 FROM Commande c WHERE ((:compteId IS NOT NULL AND c.clientAffectation.compte.id = :compteId) OR c.clientAffectation.compte.email = :identifiant OR c.clientAffectation.compte.telephone = :identifiant) AND c.statut IN (com.kadi_aon.mon_salon.stock.enums.StatutCommande.EN_ATTENTE, com.kadi_aon.mon_salon.stock.enums.StatutCommande.VALIDEE)")
+    boolean hasCommandesEnCours(@Param("compteId") Long compteId, @Param("identifiant") String identifiant);
 }

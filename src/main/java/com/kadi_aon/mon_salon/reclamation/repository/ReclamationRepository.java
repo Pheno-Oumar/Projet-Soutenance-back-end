@@ -31,5 +31,8 @@ public interface ReclamationRepository extends JpaRepository<Reclamation, Long> 
             @org.springframework.data.repository.query.Param("identifiant") String identifiant,
             @org.springframework.data.repository.query.Param("slugSalon") String slugSalon,
             @org.springframework.data.repository.query.Param("statut") StatutReclamation statut);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(r) > 0 FROM Reclamation r WHERE ((:compteId IS NOT NULL AND r.affectationClient.compte.id = :compteId) OR r.affectationClient.compte.email = :identifiant OR r.affectationClient.compte.telephone = :identifiant) AND r.statut IN (com.kadi_aon.mon_salon.reclamation.enums.StatutReclamation.EN_ATTENTE, com.kadi_aon.mon_salon.reclamation.enums.StatutReclamation.EN_COURS)")
+    boolean hasReclamationsEnCours(@org.springframework.data.repository.query.Param("compteId") Long compteId, @org.springframework.data.repository.query.Param("identifiant") String identifiant);
 }
 

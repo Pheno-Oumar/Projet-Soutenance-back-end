@@ -43,6 +43,7 @@ import com.kadi_aon.mon_salon.profilcapillaire.dto.ProfilCapillaireDTOResponse;
 import com.kadi_aon.mon_salon.profilcapillaire.service.ProfilCapillaireService;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationCreateDTORequest;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationDTOResponse;
+import com.kadi_aon.mon_salon.reclamation.dto.TypeReclamationEligibiliteDTO;
 import com.kadi_aon.mon_salon.reclamation.service.ReclamationSalonService;
 import com.kadi_aon.mon_salon.rendezvous.dto.RendezVousDTOResponse;
 import com.kadi_aon.mon_salon.rendezvous.service.RendezVousService;
@@ -50,6 +51,7 @@ import com.kadi_aon.mon_salon.rgpd.dto.DemandeExportDTORequest;
 import com.kadi_aon.mon_salon.rgpd.dto.DemandeExportDTOResponse;
 import com.kadi_aon.mon_salon.rgpd.dto.DemandeSuppressionDTORequest;
 import com.kadi_aon.mon_salon.rgpd.dto.DemandeSuppressionDTOResponse;
+import com.kadi_aon.mon_salon.rgpd.dto.EligibiliteSuppressionDTO;
 import com.kadi_aon.mon_salon.rgpd.service.RgpdClientService;
 import com.kadi_aon.mon_salon.stock.dto.CommandeDTOResponse;
 import com.kadi_aon.mon_salon.stock.dto.PanierDTOResponse;
@@ -509,6 +511,15 @@ public class ClientPlateformeController {
         return ResponseEntity.ok(new APIResponse<>(true, "Détail de la réclamation récupéré", response));
     }
 
+    @GetMapping("/reclamations/types-eligibles")
+    @Operation(summary = "Obtenir les types de réclamations et leur éligibilité pour un salon")
+    public ResponseEntity<APIResponse<List<TypeReclamationEligibiliteDTO>>> obtenirTypesReclamationEligibles(
+            @RequestParam String slugSalon,
+            Principal principal) {
+        List<TypeReclamationEligibiliteDTO> types = reclamationSalonService.obtenirTypesEligiblesClient(slugSalon, principal.getName());
+        return ResponseEntity.ok(new APIResponse<>(true, "Types de réclamation éligibles récupérés", types));
+    }
+
     @PostMapping("/reclamations")
     @Operation(summary = "Déposer une nouvelle réclamation en ciblant un salon spécifique")
     public ResponseEntity<APIResponse<ReclamationDTOResponse>> deposerReclamation(
@@ -568,5 +579,12 @@ public class ClientPlateformeController {
     public ResponseEntity<APIResponse<List<DemandeSuppressionDTOResponse>>> consulterSuiviSuppression(Principal principal) {
         List<DemandeSuppressionDTOResponse> response = rgpdClientService.consulterMesDemandesSuppression(principal.getName());
         return ResponseEntity.ok(new APIResponse<>(true, "Suivi des demandes de suppression", response));
+    }
+
+    @GetMapping("/rgpd/eligibilite-suppression")
+    @Operation(summary = "Vérifier l'éligibilité à la suppression de compte")
+    public ResponseEntity<APIResponse<EligibiliteSuppressionDTO>> verifierEligibiliteSuppression(Principal principal) {
+        EligibiliteSuppressionDTO response = rgpdClientService.verifierEligibiliteSuppression(principal.getName());
+        return ResponseEntity.ok(new APIResponse<>(true, "Éligibilité à la suppression vérifiée", response));
     }
 }

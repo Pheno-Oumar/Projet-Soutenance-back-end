@@ -28,6 +28,12 @@ import com.kadi_aon.mon_salon.rgpd.enums.StatutExportDonnees;
 import com.kadi_aon.mon_salon.rgpd.repository.DemandeExportDonneesRepository;
 import com.kadi_aon.mon_salon.rgpd.repository.DemandeSuppressionCompteRepository;
 
+import com.kadi_aon.mon_salon.rgpd.dto.EligibiliteSuppressionDTO;
+import com.kadi_aon.mon_salon.salon.repository.AffectationSalonRepository;
+import com.kadi_aon.mon_salon.stock.repository.CommandeRepository;
+import com.kadi_aon.mon_salon.rendezvous.repository.RendezVousRepository;
+import com.kadi_aon.mon_salon.reclamation.repository.ReclamationRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +44,10 @@ public class RgpdClientService {
     private final DemandeSuppressionCompteRepository demandeSuppressionRepository;
     private final DemandeExportDonneesRepository demandeExportRepository;
     private final CompteRepository compteRepository;
+    private final AffectationSalonRepository affectationSalonRepository;
+    private final CommandeRepository commandeRepository;
+    private final RendezVousRepository rendezVousRepository;
+    private final ReclamationRepository reclamationRepository;
     private final CloudinaryService cloudinaryService;
     private final NotificationEmailService notificationEmailService;
     private final AuditLogService auditLogService;
@@ -48,6 +58,10 @@ public class RgpdClientService {
             DemandeSuppressionCompteRepository demandeSuppressionRepository,
             DemandeExportDonneesRepository demandeExportRepository,
             CompteRepository compteRepository,
+            AffectationSalonRepository affectationSalonRepository,
+            CommandeRepository commandeRepository,
+            RendezVousRepository rendezVousRepository,
+            ReclamationRepository reclamationRepository,
             CloudinaryService cloudinaryService,
             NotificationEmailService notificationEmailService,
             AuditLogService auditLogService,
@@ -56,10 +70,60 @@ public class RgpdClientService {
         this.demandeSuppressionRepository = demandeSuppressionRepository;
         this.demandeExportRepository = demandeExportRepository;
         this.compteRepository = compteRepository;
+        this.affectationSalonRepository = affectationSalonRepository;
+        this.commandeRepository = commandeRepository;
+        this.rendezVousRepository = rendezVousRepository;
+        this.reclamationRepository = reclamationRepository;
         this.cloudinaryService = cloudinaryService;
         this.notificationEmailService = notificationEmailService;
         this.auditLogService = auditLogService;
         this.objectMapper = (objectMapper != null) ? objectMapper : new ObjectMapper();
+    }
+
+    @Transactional(readOnly = true)
+    public EligibiliteSuppressionDTO verifierEligibiliteSuppression(String clientEmail) {
+        Compte compte = compteRepository.findByIdentifiant(clientEmail)
+                .or(() -> compteRepository.findByTelephone(clientEmail))
+                .or(() -> compteRepository.findByEmail(clientEmail))
+                .orElseThrow(() -> new EntityNotFoundException("Compte introuvable pour l'identifiant : " + clientEmail));
+
+        boolean demandeEnCours = false;
+        if (compte.getEmail() != null) {
+            demandeEnCours = demandeSuppressionRepository.existsByCompteEmailAndStatut(compte.getEmail(), StatutDemandeSuppression.EN_ATTENTE);
+        }
+        if (!demandeEnCours && compte.getId() != null) {
+            demandeEnCours = demandeSuppressionRepository.existsByCompteIdAndStatut(compte.getId(), StatutDemandeSuppression.EN_ATTENTE);
+        }
+
+        List<String> motifs = new java.util.ArrayList<>();
+
+        // 1. Acteurs de la plateforme (ex: ADMIN_SYSTEME)
+        if (compte.getRolePlateforme() != null) {
+            motifs.add("Les administrateurs et gestionnaires de la plateforme ne peuvent pas supprimer leur compte ici.");
+        }
+
+        // 2. Propriétaires et membres du personnel d'un salon (MANAGER, COIFFEUR, CAISSIER, etc.)
+        if (compte.getId() != null && affectationSalonRepository.isPersonnelOuProprietaireSalon(compte.getId())) {
+            motifs.add("Les propriétaires et membres du personnel d'un salon ne peuvent pas supprimer leur compte. Veuillez contacter l'administration.");
+        }
+
+        // 3. Commandes de produits en cours de traitement ou prêtes pour retrait
+        if (commandeRepository.hasCommandesEnCours(compte.getId(), clientEmail)) {
+            motifs.add("Vous avez au moins une commande de produits en cours ou en attente de récupération.");
+        }
+
+        // 4. Rendez-vous prévus ou en cours
+        if (rendezVousRepository.hasRendezVousEnCours(compte.getId(), clientEmail, LocalDateTime.now())) {
+            motifs.add("Vous avez au moins un rendez-vous prévu ou en cours.");
+        }
+
+        // 5. Réclamations en cours de traitement
+        if (reclamationRepository.hasReclamationsEnCours(compte.getId(), clientEmail)) {
+            motifs.add("Vous avez au moins une réclamation en cours de traitement.");
+        }
+
+        boolean eligible = motifs.isEmpty() && !demandeEnCours;
+        return new EligibiliteSuppressionDTO(eligible, motifs, demandeEnCours);
     }
 
     @Transactional
@@ -69,16 +133,12 @@ public class RgpdClientService {
                 .or(() -> compteRepository.findByEmail(clientEmail))
                 .orElseThrow(() -> new EntityNotFoundException("Compte introuvable pour l'identifiant : " + clientEmail));
 
-        boolean dejaEnAttente = false;
-        if (compte.getEmail() != null) {
-            dejaEnAttente = demandeSuppressionRepository.existsByCompteEmailAndStatut(compte.getEmail(), StatutDemandeSuppression.EN_ATTENTE);
-        }
-        if (!dejaEnAttente && compte.getId() != null) {
-            dejaEnAttente = demandeSuppressionRepository.existsByCompteIdAndStatut(compte.getId(), StatutDemandeSuppression.EN_ATTENTE);
-        }
-
-        if (dejaEnAttente) {
+        EligibiliteSuppressionDTO eligibilite = verifierEligibiliteSuppression(clientEmail);
+        if (eligibilite.demandeEnCours()) {
             throw new IllegalStateException("Une demande de suppression de compte est déjà en cours de traitement pour cet utilisateur.");
+        }
+        if (!eligibilite.eligible()) {
+            throw new IllegalStateException("Votre compte n'est pas éligible à la suppression : " + String.join(" ", eligibilite.motifsIneligibilite()));
         }
 
         DemandeSuppressionCompte demande = DemandeSuppressionCompte.builder()

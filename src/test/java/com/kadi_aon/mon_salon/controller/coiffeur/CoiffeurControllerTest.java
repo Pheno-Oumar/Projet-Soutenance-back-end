@@ -66,7 +66,7 @@ class CoiffeurControllerTest {
         void consulterProfilCapillaireClient_succes() {
                 CodeProfilVerificationDTORequest request = new CodeProfilVerificationDTORequest("123456");
                 ProfilCapillaireDTOResponse dto = new ProfilCapillaireDTOResponse(
-                                1L, 10L, "Nom", "Prenom", com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux.LISSES, null, null, null, null, null, null,
+                                1L, 10L, "Nom", "Prenom", com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux.LISSES, null, null, null, null,
                                 true, null, null);
                 when(profilCapillaireService.consulterProfilClientParCoiffeur("mon-salon", 10L, request,
                                 "coiffeur@test.com"))

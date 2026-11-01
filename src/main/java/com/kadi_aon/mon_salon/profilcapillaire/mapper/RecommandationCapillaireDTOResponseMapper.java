@@ -41,8 +41,6 @@ public class RecommandationCapillaireDTOResponseMapper implements Function<Recom
                 r.getTypeCheveux(),
                 r.getTexture(),
                 r.getPorosite(),
-                r.getLongueur(),
-                r.getDensite(),
                 r.getCuirChevelu(),
                 r.getEtatCheveux(),
                 produitConseilMapper.apply(r.getProduitLavage()),
@@ -54,7 +52,6 @@ public class RecommandationCapillaireDTOResponseMapper implements Function<Recom
                 r.getScoreHydratation(),
                 r.getScoreFinition(),
                 r.getScoreGlobal(),
-                r.getConseilsPersonnalises(),
                 joursRestants
         );
     }

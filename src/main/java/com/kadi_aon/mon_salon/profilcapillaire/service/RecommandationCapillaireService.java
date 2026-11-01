@@ -93,8 +93,6 @@ public class RecommandationCapillaireService {
 
         String reference = "REC-" + Year.now().getValue() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        String conseils = genererConseilsPersonnalises(profil);
-
         RecommandationCapillaire reco = RecommandationCapillaire.builder()
                 .reference(reference)
                 .client(compte)
@@ -102,8 +100,6 @@ public class RecommandationCapillaireService {
                 .typeCheveux(profil.getTypeCheveux())
                 .texture(profil.getTexture())
                 .porosite(profil.getPorosite())
-                .longueur(profil.getLongueur())
-                .densite(profil.getDensite())
                 .cuirChevelu(profil.getCuirChevelu())
                 .etatCheveux(profil.getEtatCheveux())
                 .produitLavage(bestLavage.produit)
@@ -115,7 +111,6 @@ public class RecommandationCapillaireService {
                 .scoreHydratation(bestHydratation.score)
                 .scoreFinition(bestFinition.score)
                 .scoreGlobal(scoreGlobal)
-                .conseilsPersonnalises(conseils)
                 .build();
 
         RecommandationCapillaire saved = recommandationRepository.save(reco);
@@ -248,20 +243,6 @@ public class RecommandationCapillaireService {
         return new ScoredProduct(best, score);
     }
 
-    private String genererConseilsPersonnalises(ProfilCapillaire profil) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Routine capillaire sur mesure en 4 étapes :\n");
-        sb.append("1. Lavage : Nettoyez votre cuir chevelu en douceur sans décaper les longueurs.\n");
-        sb.append("2. Soin profond : Appliquez le masque nourrissant, laissez poser 20-30 min sous charlotte chauffante.\n");
-        sb.append("3. Hydratation : Sur cheveux humides, appliquez votre soin sans rinçage pour gorger la fibre d'eau.\n");
-        sb.append("4. Finition : Scellez l'hydratation avec une touche d'huile ou de beurre pour protéger vos pointes.\n\n");
-        sb.append("Astuces économiques & Recettes maison (0 FCFA ou petit budget) :\n");
-        sb.append("• Bain d'huile tiède maison : Huile d'olive ou de coco pure avant le lavage pour assouplir la fibre.\n");
-        sb.append("• Masque nourrissant naturel : Avocat mûr écrasé + 1 cuillère de miel ou yaourt nature pendant 30 min.\n");
-        sb.append("• Eau de riz fermentée : Excellente lotion fortifiante naturelle pour stimuler la pousse.\n");
-        sb.append("• Protection de nuit gratuite : Dormez avec un foulard en satin ou tressez vos cheveux sans serrer.");
-        return sb.toString();
-    }
 
     private record ScoredProduct(ProduitConseilCapillaire produit, int score) {}
 }

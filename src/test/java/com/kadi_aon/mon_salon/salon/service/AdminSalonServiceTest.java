@@ -56,6 +56,8 @@ class AdminSalonServiceTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private AuditLogService auditLogService;
+    @Mock
+    private HoraireSalonService horaireSalonService;
 
     @InjectMocks
     private AdminSalonService adminSalonService;

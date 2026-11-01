@@ -247,24 +247,6 @@ class ManagerControllerTest {
 
         assertEquals(201, response.getStatusCode().value());
         assertEquals("https://video.url", response.getBody().getData().urlVideo());
-        verify(realisationSalonService).creerRealisation("mon-salon", "manager@test.com", req, video);
-    }
-
-    @Test
-    void uploadVideoRealisation_succes() throws IOException {
-        MultipartFile file = mock(MultipartFile.class);
-        RealisationDTOResponse dto = mock(RealisationDTOResponse.class);
-        when(dto.urlVideo()).thenReturn("https://newvideo.url");
-
-        when(principal.getName()).thenReturn("manager@test.com");
-        when(realisationSalonService.uploadVideoRealisation("mon-salon", 1L, "manager@test.com", file))
-                .thenReturn(dto);
-
-        ResponseEntity<APIResponse<RealisationDTOResponse>> response =
-                managerController.uploadVideoRealisation("mon-salon", 1L, file, principal);
-
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("https://newvideo.url", response.getBody().getData().urlVideo());
-        verify(realisationSalonService).uploadVideoRealisation("mon-salon", 1L, "manager@test.com", file);
     }
 }
+

@@ -326,8 +326,6 @@ public class ToolCatalog {
         pProfil.put("typeCheveux", prop("string", "Type de cheveux: LISSES, ONDULES, BOUCLES, FRISES, CREPUS"));
         pProfil.put("texture", prop("string", "Texture: FINS, MOYENS, EPAIS"));
         pProfil.put("porosite", prop("string", "Porosité: FAIBLE, MOYENNE, FORTE"));
-        pProfil.put("longueur", prop("string", "Longueur: COURTS, MI_LONGS, LONGS, TRES_LONGS"));
-        pProfil.put("densite", prop("string", "Densité: FAIBLE, MOYENNE, FORTE"));
         pProfil.put("cuirChevelu", prop("string", "État cuir chevelu: NORMAL, SEC, GRAS, SENSIBLE, PELLICULES"));
         pProfil.put("etatCheveux", prop("string", "État des cheveux: SAIN, SEC, ABIME, CASSE, COLORE, DEFRISE, TRANSITION"));
         register("client_mettre_a_jour_profil_capillaire", "Met à jour le profil capillaire (nécessite confirmation).", schema(pProfil, null), clients, true);

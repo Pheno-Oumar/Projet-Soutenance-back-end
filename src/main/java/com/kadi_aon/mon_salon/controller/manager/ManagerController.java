@@ -403,32 +403,6 @@ public class ManagerController {
                 .body(new APIResponse<>(true, "Réalisation créée avec succès", response));
     }
 
-    @PutMapping(path = "/realisations/{id}", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Modifier les données d'une réalisation (titre, description, date, coiffeur)")
-    public ResponseEntity<APIResponse<com.kadi_aon.mon_salon.realisation.dto.RealisationDTOResponse>> modifierRealisation(
-            @PathVariable String slugSalon,
-            @PathVariable Long id,
-            @Valid @RequestBody com.kadi_aon.mon_salon.realisation.dto.RealisationUpdateDTORequest request,
-            Principal principal) throws java.io.IOException {
-
-        com.kadi_aon.mon_salon.realisation.dto.RealisationDTOResponse response = realisationSalonService
-                .modifierRealisation(slugSalon, id, principal.getName(), request);
-        return ResponseEntity.ok(new APIResponse<>(true, "Réalisation mise à jour avec succès", response));
-    }
-
-    @PatchMapping(path = "/realisations/{id}/video", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Mettre à jour la vidéo d'une réalisation (supprime l'ancienne sur Cloudinary)")
-    public ResponseEntity<APIResponse<com.kadi_aon.mon_salon.realisation.dto.RealisationDTOResponse>> uploadVideoRealisation(
-            @PathVariable String slugSalon,
-            @PathVariable Long id,
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
-            Principal principal) throws java.io.IOException {
-
-        com.kadi_aon.mon_salon.realisation.dto.RealisationDTOResponse response = realisationSalonService
-                .uploadVideoRealisation(slugSalon, id, principal.getName(), file);
-        return ResponseEntity.ok(new APIResponse<>(true, "Vidéo de la réalisation mise à jour avec succès", response));
-    }
-
     @PatchMapping("/realisations/{id}/publication")
     @Operation(summary = "Modifier le statut de publication d'une réalisation")
     public ResponseEntity<APIResponse<com.kadi_aon.mon_salon.realisation.dto.RealisationDTOResponse>> modifierStatutPublication(

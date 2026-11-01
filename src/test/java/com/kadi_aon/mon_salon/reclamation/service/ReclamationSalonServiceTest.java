@@ -27,15 +27,18 @@ import com.kadi_aon.mon_salon.notification.service.NotificationEmailService;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationCreateDTORequest;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationDTOResponse;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationTraiterDTORequest;
+import com.kadi_aon.mon_salon.facturation.repository.PaiementRepository;
 import com.kadi_aon.mon_salon.reclamation.entity.Reclamation;
 import com.kadi_aon.mon_salon.reclamation.enums.StatutReclamation;
 import com.kadi_aon.mon_salon.reclamation.repository.ReclamationRepository;
+import com.kadi_aon.mon_salon.rendezvous.repository.RendezVousRepository;
 import com.kadi_aon.mon_salon.salon.entity.AffectationSalon;
 import com.kadi_aon.mon_salon.salon.entity.RoleSalon;
 import com.kadi_aon.mon_salon.salon.entity.Salon;
 import com.kadi_aon.mon_salon.salon.enums.TypeRoleSalon;
 import com.kadi_aon.mon_salon.salon.repository.AffectationSalonRepository;
 import com.kadi_aon.mon_salon.salon.repository.SalonRepository;
+import com.kadi_aon.mon_salon.stock.repository.CommandeRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ReclamationSalonServiceTest {
@@ -54,6 +57,15 @@ class ReclamationSalonServiceTest {
 
     @Mock
     private AuditLogService auditLogService;
+
+    @Mock
+    private CommandeRepository commandeRepository;
+
+    @Mock
+    private RendezVousRepository rendezVousRepository;
+
+    @Mock
+    private PaiementRepository paiementRepository;
 
     @InjectMocks
     private ReclamationSalonService reclamationSalonService;
@@ -110,6 +122,7 @@ class ReclamationSalonServiceTest {
     void deposerReclamation_Succes() {
         when(affectationSalonRepository.findByCompteEmailAndSalonSlugAndStatutTrue("awa@test.com", "salon-chic"))
                 .thenReturn(Optional.of(clientAffectation));
+        when(rendezVousRepository.existsByClientEmailAndSalonSlug("awa@test.com", "salon-chic")).thenReturn(true);
         when(reclamationRepository.save(any(Reclamation.class))).thenAnswer(inv -> {
             Reclamation r = inv.getArgument(0);
             r.setId(51L);

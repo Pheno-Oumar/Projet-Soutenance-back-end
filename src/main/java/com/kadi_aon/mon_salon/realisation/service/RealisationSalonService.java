@@ -72,6 +72,11 @@ public class RealisationSalonService {
             throw new IllegalArgumentException("Une réalisation doit obligatoirement être accompagnée d'une vidéo.");
         }
 
+        String contentType = videoFile.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("video/")) {
+            throw new IllegalArgumentException("Une réalisation doit obligatoirement être un fichier vidéo (MP4, WebM, MOV, etc.). Les photos ne sont pas autorisées pour les réalisations.");
+        }
+
         Compte coiffeur = null;
         if (request.coiffeurId() != null) {
             coiffeur = validerCoiffeur(slugSalon, request.coiffeurId());
@@ -107,117 +112,6 @@ public class RealisationSalonService {
         );
 
         log.info("Réalisation ID {} créée avec succès par le manager {} dans le salon {}", saved.getId(), managerEmail, slugSalon);
-        return mapToResponse(saved);
-    }
-
-    @Transactional
-    public RealisationDTOResponse modifierRealisation(
-            String slugSalon,
-            Long realisationId,
-            String managerEmail,
-            RealisationUpdateDTORequest request,
-            MultipartFile videoFile) throws IOException {
-
-        AffectationSalon affectation = validerManager(slugSalon, managerEmail);
-
-        Realisation realisation = realisationRepository.findByIdAndSalonSlug(realisationId, slugSalon)
-                .orElseThrow(() -> new EntityNotFoundException("Réalisation introuvable ID " + realisationId + " dans le salon " + slugSalon));
-
-        String ancienneValeur = "Titre=" + realisation.getTitre() + ", Video=" + realisation.getUrlVideo();
-
-        if (request.coiffeurId() != null) {
-            Compte coiffeur = validerCoiffeur(slugSalon, request.coiffeurId());
-            realisation.setCoiffeur(coiffeur);
-        }
-
-        if (request.titre() != null && !request.titre().isBlank()) {
-            realisation.setTitre(request.titre().trim());
-        }
-
-        if (request.description() != null) {
-            realisation.setDescription(request.description().trim());
-        }
-
-        if (request.dateRealisation() != null) {
-            realisation.setDateRealisation(request.dateRealisation());
-        }
-
-        // Si une nouvelle vidéo est envoyée, on supprime l'ancienne de Cloudinary puis on upload la nouvelle
-        if (videoFile != null && !videoFile.isEmpty()) {
-            String ancienneVideo = realisation.getUrlVideo();
-            String nouvelleVideoUrl = cloudinaryService.uploadVideoRealisation(videoFile, slugSalon);
-            realisation.setUrlVideo(nouvelleVideoUrl);
-
-            if (ancienneVideo != null && !ancienneVideo.isBlank()) {
-                cloudinaryService.deleteMediaByUrl(ancienneVideo, "video");
-            }
-        }
-
-        realisation.setDateModification(LocalDateTime.now());
-        Realisation saved = realisationRepository.save(realisation);
-
-        String nouvelleValeur = "Titre=" + saved.getTitre() + ", Video=" + saved.getUrlVideo();
-        auditLogService.logActionSalon(
-                TypeActionAudit.MODIFICATION,
-                "Realisation",
-                String.valueOf(saved.getId()),
-                ancienneValeur,
-                nouvelleValeur,
-                affectation,
-                TypeRoleSalon.MANAGER.name()
-        );
-
-        log.info("Réalisation ID {} mise à jour par le manager {}", saved.getId(), managerEmail);
-        return mapToResponse(saved);
-    }
-
-    @Transactional
-    public RealisationDTOResponse modifierRealisation(
-            String slugSalon,
-            Long realisationId,
-            String managerEmail,
-            RealisationUpdateDTORequest request) throws IOException {
-        return modifierRealisation(slugSalon, realisationId, managerEmail, request, null);
-    }
-
-    @Transactional
-    public RealisationDTOResponse uploadVideoRealisation(
-            String slugSalon,
-            Long realisationId,
-            String managerEmail,
-            MultipartFile videoFile) throws IOException {
-
-        AffectationSalon affectation = validerManager(slugSalon, managerEmail);
-
-        if (videoFile == null || videoFile.isEmpty()) {
-            throw new IllegalArgumentException("Le fichier vidéo est obligatoire pour la mise à jour.");
-        }
-
-        Realisation realisation = realisationRepository.findByIdAndSalonSlug(realisationId, slugSalon)
-                .orElseThrow(() -> new EntityNotFoundException("Réalisation introuvable ID " + realisationId + " dans le salon " + slugSalon));
-
-        String ancienneVideo = realisation.getUrlVideo();
-        String nouvelleVideoUrl = cloudinaryService.uploadVideoRealisation(videoFile, slugSalon);
-        realisation.setUrlVideo(nouvelleVideoUrl);
-        realisation.setDateModification(LocalDateTime.now());
-
-        if (ancienneVideo != null && !ancienneVideo.isBlank()) {
-            cloudinaryService.deleteMediaByUrl(ancienneVideo, "video");
-        }
-
-        Realisation saved = realisationRepository.save(realisation);
-
-        auditLogService.logActionSalon(
-                TypeActionAudit.MODIFICATION,
-                "Realisation (Video)",
-                String.valueOf(saved.getId()),
-                "Ancienne video: " + ancienneVideo,
-                "Nouvelle video: " + nouvelleVideoUrl,
-                affectation,
-                TypeRoleSalon.MANAGER.name()
-        );
-
-        log.info("Vidéo de la réalisation ID {} mise à jour par le manager {}", saved.getId(), managerEmail);
         return mapToResponse(saved);
     }
 

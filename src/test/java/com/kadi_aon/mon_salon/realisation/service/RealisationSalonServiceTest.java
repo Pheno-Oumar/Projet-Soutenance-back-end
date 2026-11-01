@@ -150,43 +150,6 @@ class RealisationSalonServiceTest {
     }
 
     @Test
-    void modifierRealisation_avecNouvelleVideo_supprimeAncienne() throws IOException {
-        when(affectationSalonRepository.findByCompteEmailAndSalonSlugAndStatutTrue("manager@test.com", "salon-chic"))
-                .thenReturn(Optional.of(affectationManager));
-
-        Realisation existant = Realisation.builder()
-                .id(10L)
-                .salon(salon)
-                .titre("Ancien titre")
-                .urlVideo("https://res.cloudinary.com/test/video/upload/v1/realisations/ancienne.mp4")
-                .build();
-
-        when(realisationRepository.findByIdAndSalonSlug(10L, "salon-chic"))
-                .thenReturn(Optional.of(existant));
-
-        MultipartFile nouvelleVideo = mock(MultipartFile.class);
-        when(nouvelleVideo.isEmpty()).thenReturn(false);
-        when(cloudinaryService.uploadVideoRealisation(nouvelleVideo, "salon-chic"))
-                .thenReturn("https://res.cloudinary.com/test/video/upload/v1/realisations/nouvelle.mp4");
-
-        when(realisationRepository.save(any(Realisation.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        RealisationUpdateDTORequest request = new RealisationUpdateDTORequest(
-                "Nouveau titre", "Nouvelle desc", null, null
-        );
-
-        RealisationDTOResponse response = realisationSalonService.modifierRealisation(
-                "salon-chic", 10L, "manager@test.com", request, nouvelleVideo
-        );
-
-        assertNotNull(response);
-        assertEquals("Nouveau titre", response.titre());
-        assertEquals("https://res.cloudinary.com/test/video/upload/v1/realisations/nouvelle.mp4", response.urlVideo());
-        // 🔥 Vérifie la suppression de l'ancienne vidéo sur Cloudinary
-        verify(cloudinaryService).deleteMediaByUrl("https://res.cloudinary.com/test/video/upload/v1/realisations/ancienne.mp4", "video");
-    }
-
-    @Test
     void modifierStatutPublication_succes() {
         when(affectationSalonRepository.findByCompteEmailAndSalonSlugAndStatutTrue("manager@test.com", "salon-chic"))
                 .thenReturn(Optional.of(affectationManager));

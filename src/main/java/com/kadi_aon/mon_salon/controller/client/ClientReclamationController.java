@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kadi_aon.mon_salon.common.dto.response.APIResponse;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationCreateDTORequest;
 import com.kadi_aon.mon_salon.reclamation.dto.ReclamationDTOResponse;
+import com.kadi_aon.mon_salon.reclamation.dto.TypeReclamationEligibiliteDTO;
 import com.kadi_aon.mon_salon.reclamation.service.ReclamationSalonService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,5 +64,14 @@ public class ClientReclamationController {
             Principal principal) {
         ReclamationDTOResponse response = reclamationSalonService.obtenirReclamationClient(slugSalon, id, principal.getName());
         return ResponseEntity.ok(new APIResponse<>(true, "Détail de la réclamation récupéré avec succès", response));
+    }
+
+    @GetMapping("/types-eligibles")
+    @Operation(summary = "Obtenir les types de réclamations éligibles pour ce salon")
+    public ResponseEntity<APIResponse<List<TypeReclamationEligibiliteDTO>>> obtenirTypesReclamationEligibles(
+            @PathVariable String slugSalon,
+            Principal principal) {
+        List<TypeReclamationEligibiliteDTO> response = reclamationSalonService.obtenirTypesEligiblesClient(slugSalon, principal.getName());
+        return ResponseEntity.ok(new APIResponse<>(true, "Types de réclamation éligibles récupérés avec succès", response));
     }
 }

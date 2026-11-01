@@ -11,8 +11,10 @@ import com.kadi_aon.mon_salon.account.enums.TypeRolePlateforme;
 import com.kadi_aon.mon_salon.account.repository.CompteRepository;
 import com.kadi_aon.mon_salon.account.repository.RolePlateformeRepository;
 import com.kadi_aon.mon_salon.salon.entity.RoleSalon;
+import com.kadi_aon.mon_salon.salon.entity.Salon;
 import com.kadi_aon.mon_salon.salon.enums.TypeRoleSalon;
 import com.kadi_aon.mon_salon.salon.repository.RoleSalonRepository;
+import com.kadi_aon.mon_salon.salon.service.HoraireSalonService;
 
 // import java.util.List;
 // import com.kadi_aon.mon_salon.profilcapillaire.entity.ProduitConseilCapillaire;
@@ -31,19 +33,22 @@ public class Initialisateur implements CommandLineRunner {
     private final com.kadi_aon.mon_salon.salon.repository.SalonRepository salonRepository;
     // private final ProduitConseilCapillaireRepository produitConseilRepository;
     private final PasswordEncoder passwordEncoder;
+    private final HoraireSalonService horaireSalonService;
 
     public Initialisateur(
             RolePlateformeRepository rolePlateformeRepository,
             RoleSalonRepository roleSalonRepository,
             CompteRepository compteRepository,
             com.kadi_aon.mon_salon.salon.repository.SalonRepository salonRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            HoraireSalonService horaireSalonService) {
         super();
         this.rolePlateformeRepository = rolePlateformeRepository;
         this.roleSalonRepository = roleSalonRepository;
         this.compteRepository = compteRepository;
         this.salonRepository = salonRepository;
         this.passwordEncoder = passwordEncoder;
+        this.horaireSalonService = horaireSalonService;
     }
 
     @Override
@@ -52,6 +57,7 @@ public class Initialisateur implements CommandLineRunner {
         initRoles();
         initAdminSysteme();
         initSalonsLogos();
+        initHorairesSalons();
         // initProduitsConseils();
     }
 
@@ -149,6 +155,12 @@ public class Initialisateur implements CommandLineRunner {
                 salonRepository.save(s);
             }
             idx++;
+        }
+    }
+
+    private void initHorairesSalons() {
+        for (Salon s : salonRepository.findAll()) {
+            horaireSalonService.initialiserHorairesParDefaut(s);
         }
     }
 

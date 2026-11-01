@@ -52,5 +52,8 @@ public interface AffectationSalonRepository extends JpaRepository<AffectationSal
 
     @Query("SELECT COUNT(a) > 0 FROM AffectationSalon a JOIN a.roles r WHERE (a.compte.email = :email OR a.compte.telephone = :email) AND r.role = com.kadi_aon.mon_salon.salon.enums.TypeRoleSalon.CLIENT AND a.statut = true AND a.compte.statut = true")
     boolean hasClientRole(@Param("email") String email);
+
+    @Query("SELECT COUNT(a) > 0 FROM AffectationSalon a JOIN a.roles r WHERE a.compte.id = :compteId AND a.statut = true AND r.role <> com.kadi_aon.mon_salon.salon.enums.TypeRoleSalon.CLIENT")
+    boolean isPersonnelOuProprietaireSalon(@Param("compteId") Long compteId);
 }
 

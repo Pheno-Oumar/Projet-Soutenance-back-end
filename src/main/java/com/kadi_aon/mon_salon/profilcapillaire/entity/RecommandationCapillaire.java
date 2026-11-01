@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 
 import com.kadi_aon.mon_salon.account.entity.Compte;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.CuirChevelu;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.DensiteCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.EtatCheveux;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.LongueurCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.PorositeCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TextureCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux;
@@ -58,13 +56,6 @@ public class RecommandationCapillaire {
     @Column(length = 50)
     private PorositeCheveux porosite;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private LongueurCheveux longueur;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private DensiteCheveux densite;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cuir_chevelu", length = 50)
@@ -105,8 +96,6 @@ public class RecommandationCapillaire {
     @Column(name = "score_global")
     private Integer scoreGlobal;
 
-    @Column(name = "conseils_personnalises", columnDefinition = "TEXT")
-    private String conseilsPersonnalises;
 
     public RecommandationCapillaire() {
         super();
@@ -120,8 +109,6 @@ public class RecommandationCapillaire {
             TypeCheveux typeCheveux,
             TextureCheveux texture,
             PorositeCheveux porosite,
-            LongueurCheveux longueur,
-            DensiteCheveux densite,
             CuirChevelu cuirChevelu,
             EtatCheveux etatCheveux,
             ProduitConseilCapillaire produitLavage,
@@ -132,8 +119,7 @@ public class RecommandationCapillaire {
             Integer scoreSoinProfond,
             Integer scoreHydratation,
             Integer scoreFinition,
-            Integer scoreGlobal,
-            String conseilsPersonnalises) {
+            Integer scoreGlobal) {
         super();
         this.id = id;
         this.reference = reference;
@@ -142,8 +128,6 @@ public class RecommandationCapillaire {
         this.typeCheveux = typeCheveux;
         this.texture = texture;
         this.porosite = porosite;
-        this.longueur = longueur;
-        this.densite = densite;
         this.cuirChevelu = cuirChevelu;
         this.etatCheveux = etatCheveux;
         this.produitLavage = produitLavage;
@@ -155,7 +139,6 @@ public class RecommandationCapillaire {
         this.scoreHydratation = scoreHydratation;
         this.scoreFinition = scoreFinition;
         this.scoreGlobal = scoreGlobal;
-        this.conseilsPersonnalises = conseilsPersonnalises;
     }
 
     public static Builder builder() {
@@ -170,8 +153,6 @@ public class RecommandationCapillaire {
         private TypeCheveux typeCheveux;
         private TextureCheveux texture;
         private PorositeCheveux porosite;
-        private LongueurCheveux longueur;
-        private DensiteCheveux densite;
         private CuirChevelu cuirChevelu;
         private EtatCheveux etatCheveux;
         private ProduitConseilCapillaire produitLavage;
@@ -183,7 +164,6 @@ public class RecommandationCapillaire {
         private Integer scoreHydratation;
         private Integer scoreFinition;
         private Integer scoreGlobal;
-        private String conseilsPersonnalises;
 
         public Builder id(Long id) {
             this.id = id;
@@ -220,15 +200,6 @@ public class RecommandationCapillaire {
             return this;
         }
 
-        public Builder longueur(LongueurCheveux longueur) {
-            this.longueur = longueur;
-            return this;
-        }
-
-        public Builder densite(DensiteCheveux densite) {
-            this.densite = densite;
-            return this;
-        }
 
         public Builder cuirChevelu(CuirChevelu cuirChevelu) {
             this.cuirChevelu = cuirChevelu;
@@ -285,17 +256,13 @@ public class RecommandationCapillaire {
             return this;
         }
 
-        public Builder conseilsPersonnalises(String conseilsPersonnalises) {
-            this.conseilsPersonnalises = conseilsPersonnalises;
-            return this;
-        }
 
         public RecommandationCapillaire build() {
             return new RecommandationCapillaire(
                     id, reference, client, dateRecommandation, typeCheveux, texture, porosite,
-                    longueur, densite, cuirChevelu, etatCheveux, produitLavage, produitSoinProfond,
+                    cuirChevelu, etatCheveux, produitLavage, produitSoinProfond,
                     produitHydratation, produitFinition, scoreLavage, scoreSoinProfond, scoreHydratation,
-                    scoreFinition, scoreGlobal, conseilsPersonnalises);
+                    scoreFinition, scoreGlobal);
         }
     }
 

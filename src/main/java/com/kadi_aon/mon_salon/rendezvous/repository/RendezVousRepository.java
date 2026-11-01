@@ -78,5 +78,14 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
             @Param("clientId") Long clientId,
             @Param("identifiant") String identifiant,
             @Param("slugSalon") String slugSalon);
+
+    @Query("SELECT COUNT(r) > 0 FROM RendezVous r WHERE (r.client.email = :email OR r.client.telephone = :email) AND LOWER(r.salon.slug) = LOWER(:slugSalon) AND r.statut = :statut")
+    boolean existsByClientEmailAndSalonSlugAndStatut(@Param("email") String email, @Param("slugSalon") String slugSalon, @Param("statut") StatutRendezVous statut);
+
+    @Query("SELECT COUNT(r) > 0 FROM RendezVous r WHERE (r.client.email = :email OR r.client.telephone = :email) AND LOWER(r.salon.slug) = LOWER(:slugSalon)")
+    boolean existsByClientEmailAndSalonSlug(@Param("email") String email, @Param("slugSalon") String slugSalon);
+
+    @Query("SELECT COUNT(r) > 0 FROM RendezVous r WHERE ((:compteId IS NOT NULL AND r.client.id = :compteId) OR r.client.email = :identifiant OR r.client.telephone = :identifiant) AND r.statut IN (com.kadi_aon.mon_salon.rendezvous.enums.StatutRendezVous.CONFIRME, com.kadi_aon.mon_salon.rendezvous.enums.StatutRendezVous.EN_COURS) AND r.dateHeureFin >= :now")
+    boolean hasRendezVousEnCours(@Param("compteId") Long compteId, @Param("identifiant") String identifiant, @Param("now") LocalDateTime now);
 }
 

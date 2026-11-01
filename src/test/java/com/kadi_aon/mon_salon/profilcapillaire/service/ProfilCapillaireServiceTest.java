@@ -27,9 +27,7 @@ import com.kadi_aon.mon_salon.profilcapillaire.dto.ProfilCapillaireDTORequest;
 import com.kadi_aon.mon_salon.profilcapillaire.dto.ProfilCapillaireDTOResponse;
 import com.kadi_aon.mon_salon.profilcapillaire.entity.ProfilCapillaire;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.CuirChevelu;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.DensiteCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.EtatCheveux;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.LongueurCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.PorositeCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TextureCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux;
@@ -90,7 +88,7 @@ class ProfilCapillaireServiceTest {
         when(profilCapillaireRepository.findByCompteId(1L)).thenReturn(Optional.of(profil));
 
         ProfilCapillaireDTOResponse dto = new ProfilCapillaireDTOResponse(
-                100L, 1L, "Traore", "Fatou", TypeCheveux.BOUCLES, TextureCheveux.MOYENS, PorositeCheveux.MOYENNE, null, null, null, null, true, null, null
+                100L, 1L, "Traore", "Fatou", TypeCheveux.BOUCLES, TextureCheveux.MOYENS, PorositeCheveux.MOYENNE, null, null, true, null, null
         );
         when(mapper.apply(profil)).thenReturn(dto);
 
@@ -115,11 +113,11 @@ class ProfilCapillaireServiceTest {
         when(profilCapillaireRepository.save(any(ProfilCapillaire.class))).thenAnswer(i -> i.getArgument(0));
 
         ProfilCapillaireDTORequest request = new ProfilCapillaireDTORequest(
-                TypeCheveux.CREPUS, TextureCheveux.EPAIS, PorositeCheveux.FAIBLE, LongueurCheveux.COURTS, DensiteCheveux.FORTE, CuirChevelu.SEC, EtatCheveux.SAIN
+                TypeCheveux.CREPUS, TextureCheveux.EPAIS, PorositeCheveux.FAIBLE, CuirChevelu.SEC, EtatCheveux.SAIN
         );
 
         ProfilCapillaireDTOResponse dto = new ProfilCapillaireDTOResponse(
-                100L, 1L, "Traore", "Fatou", TypeCheveux.CREPUS, TextureCheveux.EPAIS, PorositeCheveux.FAIBLE, LongueurCheveux.COURTS, DensiteCheveux.FORTE, CuirChevelu.SEC, EtatCheveux.SAIN, true, null, null
+                100L, 1L, "Traore", "Fatou", TypeCheveux.CREPUS, TextureCheveux.EPAIS, PorositeCheveux.FAIBLE, CuirChevelu.SEC, EtatCheveux.SAIN, true, null, null
         );
         when(mapper.apply(any())).thenReturn(dto);
 
@@ -153,7 +151,7 @@ class ProfilCapillaireServiceTest {
         when(passwordEncoder.matches("123456", "hashedPin123456")).thenReturn(true);
 
         ProfilCapillaireDTOResponse dto = new ProfilCapillaireDTOResponse(
-                100L, 1L, "Traore", "Fatou", TypeCheveux.BOUCLES, TextureCheveux.MOYENS, PorositeCheveux.MOYENNE, null, null, null, null, true, null, null
+                100L, 1L, "Traore", "Fatou", TypeCheveux.BOUCLES, TextureCheveux.MOYENS, PorositeCheveux.MOYENNE, null, null, true, null, null
         );
         when(mapper.apply(profil)).thenReturn(dto);
 

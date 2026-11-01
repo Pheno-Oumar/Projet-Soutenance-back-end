@@ -2,6 +2,7 @@ package com.kadi_aon.mon_salon.salon.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import com.kadi_aon.mon_salon.salon.entity.AffectationSalon;
 import com.kadi_aon.mon_salon.salon.entity.FermetureExceptionnelle;
 import com.kadi_aon.mon_salon.salon.entity.HoraireOuverture;
 import com.kadi_aon.mon_salon.salon.entity.Salon;
+import com.kadi_aon.mon_salon.salon.enums.JourSemaine;
 import com.kadi_aon.mon_salon.salon.mapper.FermetureExceptionnelleDTOResponseMapper;
 import com.kadi_aon.mon_salon.salon.mapper.HoraireOuvertureDTOResponseMapper;
 import com.kadi_aon.mon_salon.salon.repository.AffectationSalonRepository;
@@ -55,6 +57,39 @@ public class HoraireSalonService {
         this.horaireMapper = horaireMapper;
         this.fermetureMapper = fermetureMapper;
         this.auditLogService = auditLogService;
+    }
+
+    @Transactional
+    public void initialiserHorairesParDefaut(Salon salon) {
+        if (salon == null || salon.getId() == null) {
+            return;
+        }
+        LocalTime ouvertureStd = LocalTime.of(8, 30);
+        LocalTime fermetureStd = LocalTime.of(18, 30);
+        LocalTime pauseDebutStd = LocalTime.of(12, 30);
+        LocalTime pauseFinStd = LocalTime.of(13, 30);
+
+        List<HoraireOuverture> nouveauxHoraires = new ArrayList<>();
+        for (JourSemaine jour : JourSemaine.values()) {
+            if (!horaireOuvertureRepository.existsBySalonIdAndJourSemaine(salon.getId(), jour)) {
+                boolean isDimanche = (jour == JourSemaine.DIMANCHE);
+                nouveauxHoraires.add(HoraireOuverture.builder()
+                        .salon(salon)
+                        .jourSemaine(jour)
+                        .heureOuverture(isDimanche ? LocalTime.of(9, 0) : ouvertureStd)
+                        .heureFermeture(isDimanche ? LocalTime.of(14, 0) : fermetureStd)
+                        .pauseDebut(isDimanche ? null : pauseDebutStd)
+                        .pauseFin(isDimanche ? null : pauseFinStd)
+                        .actif(!isDimanche)
+                        .build());
+            }
+        }
+
+        if (!nouveauxHoraires.isEmpty()) {
+            horaireOuvertureRepository.saveAll(nouveauxHoraires);
+            log.info("{} horaire(s) d'ouverture initialisé(s) par défaut pour le salon '{}' (id: {})",
+                    nouveauxHoraires.size(), salon.getNom(), salon.getId());
+        }
     }
 
     @Transactional
@@ -118,11 +153,15 @@ public class HoraireSalonService {
         return horaireMapper.apply(saved);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<HoraireOuvertureDTOResponse> listerHoraires(String slugSalon) {
-        getSalonBySlug(slugSalon);
-        return horaireOuvertureRepository.findBySalonSlugOrderByJourSemaineAsc(slugSalon)
-                .stream()
+        Salon salon = getSalonBySlug(slugSalon);
+        List<HoraireOuverture> horaires = horaireOuvertureRepository.findBySalonSlugOrderByJourSemaineAsc(slugSalon);
+        if (horaires.isEmpty()) {
+            initialiserHorairesParDefaut(salon);
+            horaires = horaireOuvertureRepository.findBySalonSlugOrderByJourSemaineAsc(slugSalon);
+        }
+        return horaires.stream()
                 .map(horaireMapper)
                 .toList();
     }

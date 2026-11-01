@@ -4,5 +4,6 @@ public enum MotifIndisponibilite {
     CONGE,
     MALADIE,
     ABSENCE,
+    FORMATION,
     AUTRE
 }

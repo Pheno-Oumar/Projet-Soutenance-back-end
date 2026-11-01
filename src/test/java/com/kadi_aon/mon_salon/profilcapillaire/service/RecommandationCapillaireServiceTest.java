@@ -30,10 +30,8 @@ import com.kadi_aon.mon_salon.profilcapillaire.entity.ProfilCapillaire;
 import com.kadi_aon.mon_salon.profilcapillaire.entity.ProduitConseilCapillaire;
 import com.kadi_aon.mon_salon.profilcapillaire.entity.RecommandationCapillaire;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.CuirChevelu;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.DensiteCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.EtapeRoutine;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.EtatCheveux;
-import com.kadi_aon.mon_salon.profilcapillaire.enums.LongueurCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.PorositeCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TextureCheveux;
 import com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux;
@@ -85,8 +83,6 @@ class RecommandationCapillaireServiceTest {
                 .porosite(PorositeCheveux.FORTE)
                 .cuirChevelu(CuirChevelu.SEC)
                 .etatCheveux(EtatCheveux.SEC)
-                .longueur(LongueurCheveux.MI_LONGS)
-                .densite(DensiteCheveux.FORTE)
                 .build();
 
         prodLavage = ProduitConseilCapillaire.builder()
@@ -136,8 +132,8 @@ class RecommandationCapillaireServiceTest {
 
         RecommandationCapillaireDTOResponse mockDto = new RecommandationCapillaireDTOResponse(
                 1L, "REC-2026-TEST", LocalDateTime.now(), TypeCheveux.CREPUS, TextureCheveux.EPAIS,
-                PorositeCheveux.FORTE, LongueurCheveux.MI_LONGS, DensiteCheveux.FORTE, CuirChevelu.SEC,
-                EtatCheveux.SEC, null, null, null, null, 100, 100, 100, 100, 100, "Conseils", 30L
+                PorositeCheveux.FORTE, CuirChevelu.SEC,
+                EtatCheveux.SEC, null, null, null, null, 100, 100, 100, 100, 100, 30L
         );
         when(mapper.apply(any())).thenReturn(mockDto);
 
@@ -190,8 +186,8 @@ class RecommandationCapillaireServiceTest {
 
         RecommandationCapillaireDTOResponse mockDto = new RecommandationCapillaireDTOResponse(
                 1L, "REC-2026-TEST", LocalDateTime.now(), TypeCheveux.CREPUS, TextureCheveux.EPAIS,
-                PorositeCheveux.FORTE, LongueurCheveux.MI_LONGS, DensiteCheveux.FORTE, CuirChevelu.SEC,
-                EtatCheveux.SEC, null, null, null, null, 100, 100, 100, 100, 100, "Conseils", 30L
+                PorositeCheveux.FORTE, CuirChevelu.SEC,
+                EtatCheveux.SEC, null, null, null, null, 100, 100, 100, 100, 100, 30L
         );
         when(mapper.apply(any())).thenReturn(mockDto);
 

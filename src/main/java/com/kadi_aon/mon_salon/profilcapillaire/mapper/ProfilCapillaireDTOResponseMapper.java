@@ -36,8 +36,6 @@ public class ProfilCapillaireDTOResponseMapper implements Function<ProfilCapilla
                 profil.getTypeCheveux(),
                 profil.getTexture(),
                 profil.getPorosite(),
-                profil.getLongueur(),
-                profil.getDensite(),
                 profil.getCuirChevelu(),
                 profil.getEtatCheveux(),
                 hasCode,

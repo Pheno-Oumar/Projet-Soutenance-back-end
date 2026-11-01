@@ -1373,8 +1373,6 @@ public class ToolExecutor {
                             ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux.class, (String) data.get("typeCheveux")),
                             ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.TextureCheveux.class, (String) data.get("texture")),
                             ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.PorositeCheveux.class, (String) data.get("porosite")),
-                            ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.LongueurCheveux.class, (String) data.get("longueur")),
-                            ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.DensiteCheveux.class, (String) data.get("densite")),
                             ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.CuirChevelu.class, (String) data.get("cuirChevelu")),
                             ProfilCapillaireDTORequest.parseEnum(com.kadi_aon.mon_salon.profilcapillaire.enums.EtatCheveux.class, (String) data.get("etatCheveux")));
                     ProfilCapillaireDTOResponse rep = profilCapillaireService.enregistrerOuModifierProfil(email, req);

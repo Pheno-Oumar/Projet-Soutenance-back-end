@@ -40,6 +40,10 @@ import com.kadi_aon.mon_salon.rgpd.enums.StatutDemandeSuppression;
 import com.kadi_aon.mon_salon.rgpd.enums.StatutExportDonnees;
 import com.kadi_aon.mon_salon.rgpd.repository.DemandeExportDonneesRepository;
 import com.kadi_aon.mon_salon.rgpd.repository.DemandeSuppressionCompteRepository;
+import com.kadi_aon.mon_salon.salon.repository.AffectationSalonRepository;
+import com.kadi_aon.mon_salon.stock.repository.CommandeRepository;
+import com.kadi_aon.mon_salon.rendezvous.repository.RendezVousRepository;
+import com.kadi_aon.mon_salon.reclamation.repository.ReclamationRepository;
 
 @ExtendWith(MockitoExtension.class)
 class RgpdClientServiceTest {
@@ -52,6 +56,18 @@ class RgpdClientServiceTest {
 
     @Mock
     private CompteRepository compteRepository;
+
+    @Mock
+    private AffectationSalonRepository affectationSalonRepository;
+
+    @Mock
+    private CommandeRepository commandeRepository;
+
+    @Mock
+    private RendezVousRepository rendezVousRepository;
+
+    @Mock
+    private ReclamationRepository reclamationRepository;
 
     @Mock
     private CloudinaryService cloudinaryService;
@@ -177,5 +193,34 @@ class RgpdClientServiceTest {
         assertEquals(1, list.size());
         assertTrue(list.get(0).expire());
         assertEquals("EXPIRE", list.get(0).statut());
+    }
+
+    @Test
+    void verifierEligibiliteSuppression_ClientEligible() {
+        when(compteRepository.findByEmail("mamadou@test.com")).thenReturn(Optional.of(compte));
+        when(demandeSuppressionRepository.existsByCompteEmailAndStatut("mamadou@test.com", StatutDemandeSuppression.EN_ATTENTE))
+                .thenReturn(false);
+        when(affectationSalonRepository.isPersonnelOuProprietaireSalon(1L)).thenReturn(false);
+        when(commandeRepository.hasCommandesEnCours(1L, "mamadou@test.com")).thenReturn(false);
+        when(rendezVousRepository.hasRendezVousEnCours(eq(1L), eq("mamadou@test.com"), any())).thenReturn(false);
+        when(reclamationRepository.hasReclamationsEnCours(1L, "mamadou@test.com")).thenReturn(false);
+
+        var res = rgpdClientService.verifierEligibiliteSuppression("mamadou@test.com");
+        assertTrue(res.eligible());
+        assertTrue(res.motifsIneligibilite().isEmpty());
+        assertFalse(res.demandeEnCours());
+    }
+
+    @Test
+    void verifierEligibiliteSuppression_IneligiblePersonnelEtReclamation() {
+        when(compteRepository.findByEmail("mamadou@test.com")).thenReturn(Optional.of(compte));
+        when(demandeSuppressionRepository.existsByCompteEmailAndStatut("mamadou@test.com", StatutDemandeSuppression.EN_ATTENTE))
+                .thenReturn(false);
+        when(affectationSalonRepository.isPersonnelOuProprietaireSalon(1L)).thenReturn(true);
+        when(reclamationRepository.hasReclamationsEnCours(1L, "mamadou@test.com")).thenReturn(true);
+
+        var res = rgpdClientService.verifierEligibiliteSuppression("mamadou@test.com");
+        assertFalse(res.eligible());
+        assertEquals(2, res.motifsIneligibilite().size());
     }
 }

@@ -45,6 +45,7 @@ public class AdminSalonService {
     private final NotificationEmailService notificationEmailService;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
+    private final HoraireSalonService horaireSalonService;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private com.kadi_aon.mon_salon.notification.service.NotificationSmsService notificationSmsService;
@@ -57,7 +58,8 @@ public class AdminSalonService {
             SalonDTOResponseMapper salonDTOResponseMapper,
             NotificationEmailService notificationEmailService,
             PasswordEncoder passwordEncoder,
-            AuditLogService auditLogService) {
+            AuditLogService auditLogService,
+            HoraireSalonService horaireSalonService) {
         super();
         this.salonRepository = salonRepository;
         this.compteRepository = compteRepository;
@@ -67,6 +69,7 @@ public class AdminSalonService {
         this.notificationEmailService = notificationEmailService;
         this.passwordEncoder = passwordEncoder;
         this.auditLogService = auditLogService;
+        this.horaireSalonService = horaireSalonService;
     }
 
     private Compte resolveAdminCompte(String adminEmail) {
@@ -96,6 +99,9 @@ public class AdminSalonService {
 
         salon = salonRepository.save(salon);
 
+        // 2bis. Initialisation automatique des 7 horaires d'ouverture par défaut (Lundi à Dimanche)
+        horaireSalonService.initialiserHorairesParDefaut(salon);
+
         // 3. Gestion du propriétaire (existant ou création nouveau compte)
         String emailProprio = (request.emailProprietaire() != null && !request.emailProprietaire().isBlank())
                 ? request.emailProprietaire().trim().toLowerCase(Locale.ROOT)
@@ -119,7 +125,7 @@ public class AdminSalonService {
             if (emailProprio != null && compteRepository.existsByEmail(emailProprio)) {
                 throw new IllegalArgumentException("L'adresse email '" + emailProprio + "' est déjà associée à un autre compte.");
             }
-            String initialPassword = "12345";
+            String initialPassword = generateRandomPassword(6);
             proprioCompte = Compte.builder()
                     .email(emailProprio)
                     .nom("Propriétaire")
@@ -276,5 +282,9 @@ public class AdminSalonService {
             sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
         }
         return sb.toString();
+    }
+
+    private String generateRandomPassword() {
+        return generateRandomPassword(6);
     }
 }

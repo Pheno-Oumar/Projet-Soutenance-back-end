@@ -85,8 +85,6 @@ public class ProfilCapillaireService {
                 profil.setTypeCheveux(request.typeCheveux());
                 profil.setTexture(request.texture());
                 profil.setPorosite(request.porosite());
-                profil.setLongueur(request.longueur());
-                profil.setDensite(request.densite());
                 profil.setCuirChevelu(request.cuirChevelu());
                 profil.setEtatCheveux(request.etatCheveux());
 

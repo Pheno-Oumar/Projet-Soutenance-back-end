@@ -107,7 +107,7 @@ class ClientPlateformeControllerTest {
     @Test
     void getMonProfilCapillaire_succes() {
         ProfilCapillaireDTOResponse dto = new ProfilCapillaireDTOResponse(
-                1L, 10L, "Nom", "Prenom", com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux.CREPUS, null, null, null, null, null, null, true, null, null
+                1L, 10L, "Nom", "Prenom", com.kadi_aon.mon_salon.profilcapillaire.enums.TypeCheveux.CREPUS, null, null, null, null, true, null, null
         );
         when(profilCapillaireService.getMonProfil("client@test.com")).thenReturn(dto);
 
